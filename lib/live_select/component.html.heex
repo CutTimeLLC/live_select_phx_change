@@ -93,6 +93,8 @@
         name={"#{@field.form.name}[#{@field.field}_empty_selection]"}
         id={"#{@field.id}_empty_selection"}
         disabled={@disabled}
+        phx-target={assigns[:"phx-target"]}
+        phx-change={assigns[:"phx-change"]}
         data-live-select-empty
       />
     <% end %>
@@ -102,6 +104,8 @@
         name={@field.name <> "[]"}
         id={@field.id <> "_#{idx}"}
         disabled={@disabled}
+        phx-target={assigns[:"phx-target"]}
+        phx-change={assigns[:"phx-change"]}
         value={value}
       />
     <% end %>
