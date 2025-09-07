@@ -365,6 +365,7 @@ defmodule LiveSelect.Component do
           :id,
           :options,
           :"phx-target",
+          :"phx-change",
           :"phx-blur",
           :"phx-focus",
           :option,
