@@ -1135,5 +1135,23 @@ defmodule LiveSelectTest do
 
       refute_selected(live)
     end
+
+    test "preserves spaces in typed text", %{live: live} do
+      stub_options([])
+
+      type(live, "hello world")
+
+      assert_selected(live, "hello world", "hello world")
+    end
+  end
+
+  test "single mode trims spaces from typed text", %{conn: conn} do
+    stub_options([])
+
+    {:ok, live, _html} = live(conn, "/?mode=single")
+
+    type(live, "hello world ")
+
+    assert_selected(live, "hello world", "hello world")
   end
 end
