@@ -50,7 +50,7 @@ export default {
                 this.pushEventToParent("live_select_change", {id: this.el.id, field, text})
             }, this.debounceMsec())
             this.textInput().oninput = (event) => {
-                const text = event.target.value.trim()
+                const text = event.target.value
                 const field = this.el.dataset['field']
                 if (text.length >= this.updateMinLen()) {
                     this.changeEvents(this.el.id, field, text)
@@ -75,11 +75,25 @@ export default {
             })
         },
         setInputValue(value) {
-            this.textInput().value = value
+            this.textInput().value = value || ""
         },
         inputEvent(selection, mode) {
+            console.log('=== inputEvent called ===', { selection, mode })
             const selector = mode === "single" ? "input.single-mode" : (selection.length === 0 ? "input[data-live-select-empty]" : "input[type=hidden]")
-            this.el.querySelector(selector).dispatchEvent(new Event('input', {bubbles: true}))
+            const hiddenInput = this.el.querySelector(selector)
+
+            console.log('Hidden input found:', hiddenInput)
+            console.log('Hidden input current value:', hiddenInput?.value)
+
+            if (hiddenInput && mode === "single") {
+                const value = selection.length > 0 ? selection[0].value : ""
+                const encodedValue = typeof value === "object" ? JSON.stringify(value) : value
+                console.log('Setting hidden input value to:', encodedValue)
+                hiddenInput.value = encodedValue
+            }
+
+            console.log('Dispatching input event')
+            hiddenInput.dispatchEvent(new Event('input', {bubbles: true}))
         },
         mounted() {
             this.maybeStyleClearButton()
@@ -89,15 +103,18 @@ export default {
                 }
             })
             this.handleEvent("select", ({id, selection, mode, current_text, input_event, parent_event}) => {
+                console.log('=== select event received ===', { id, selection, mode, current_text, input_event, parent_event })
                 if (this.el.id === id) {
                     this.selection = selection
                     if (mode === "single") {
                         const label = selection.length > 0 ? selection[0].label : current_text
+                        console.log('Setting text input value to:', label)
                         this.setInputValue(label)
                     } else {
                         this.setInputValue(current_text)
                     }
                     if (input_event) {
+                        console.log('Triggering inputEvent because input_event flag is true')
                         this.inputEvent(selection, mode)
                     }
                     if (parent_event) {

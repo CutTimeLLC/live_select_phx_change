@@ -888,8 +888,6 @@ defmodule LiveSelectTest do
 
         select_nth_option(live, 2)
 
-        type(live, "ABC")
-
         assert_selected_option_class(
           live,
           2,
@@ -905,8 +903,6 @@ defmodule LiveSelectTest do
         type(live, "ABC")
 
         select_nth_option(live, 2)
-
-        type(live, "ABC")
 
         assert_selected_option_class(
           live,
@@ -924,8 +920,6 @@ defmodule LiveSelectTest do
 
         select_nth_option(live, 2)
 
-        type(live, "ABC")
-
         assert_available_option_class(
           live,
           2,
@@ -941,8 +935,6 @@ defmodule LiveSelectTest do
         type(live, "ABC")
 
         select_nth_option(live, 2)
-
-        type(live, "ABC")
 
         assert_available_option_class(
           live,
@@ -1060,6 +1052,91 @@ defmodule LiveSelectTest do
       type(live, "ABC")
       select_nth_option(live, 2, method: :click)
       assert_selected_static(live, "A", 1)
+    end
+  end
+
+  describe "text input as form value" do
+    test "typing text without selecting sets hidden input value to typed text", %{conn: conn} do
+      stub_options([])
+
+      {:ok, live, _html} = live(conn, "/")
+
+      type(live, "foo")
+
+      assert_selected(live, "foo", "foo")
+    end
+
+    test "typing then selecting option updates hidden input to option value", %{conn: conn} do
+      stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
+
+      {:ok, live, _html} = live(conn, "/")
+
+      type(live, "foo")
+      assert_selected(live, "foo", "foo")
+
+      stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
+      type(live, "ABC")
+      assert_selected(live, "ABC", "ABC")
+      assert_options(live, ["A", "B", "C"])
+
+      select_nth_option(live, 1)
+      assert_selected(live, "A", 1)
+    end
+
+    test "typing after selecting option overrides selection with new text", %{conn: conn} do
+      stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
+
+      {:ok, live, _html} = live(conn, "/")
+
+      type(live, "ABC")
+      select_nth_option(live, 1)
+      assert_selected(live, "A", 1)
+
+      type(live, "custom text")
+      assert_selected(live, "custom text", "custom text")
+    end
+
+    test "clearing text after selection sets hidden input to empty", %{conn: conn} do
+      stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
+
+      {:ok, live, _html} = live(conn, "/?update_min_len=0")
+
+      type(live, "ABC", update_min_len: 0)
+      select_nth_option(live, 1)
+      assert_selected(live, "A", 1)
+
+      type(live, "", update_min_len: 0)
+      refute_selected(live)
+    end
+
+    test "typing different text values updates hidden input each time", %{conn: conn} do
+      stub_options([])
+
+      {:ok, live, _html} = live(conn, "/")
+
+      type(live, "first")
+      assert_selected(live, "first", "first")
+
+      type(live, "second")
+      assert_selected(live, "second", "second")
+
+      type(live, "third")
+      assert_selected(live, "third", "third")
+    end
+
+    test "clicking clear button clears both text input and form field", %{conn: conn} do
+      stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
+
+      {:ok, live, _html} = live(conn, "/?allow_clear=true")
+
+      type(live, "custom text", update_min_len: 0)
+      assert_selected(live, "custom text", "custom text")
+
+      live
+      |> element("button[phx-click=clear]")
+      |> render_click()
+
+      refute_selected(live)
     end
   end
 end

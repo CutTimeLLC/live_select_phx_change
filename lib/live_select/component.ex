@@ -42,7 +42,7 @@ defmodule LiveSelect.Component do
     text_input_class: nil,
     text_input_extra_class: nil,
     text_input_selected_class: nil,
-    update_min_len: 1,
+    update_min_len: 0,
     value: nil
   ]
 
@@ -217,9 +217,24 @@ defmodule LiveSelect.Component do
     socket =
       socket
       |> assign(hide_dropdown: false, current_text: text, awaiting_update: true)
+      |> maybe_update_form_with_text(text)
 
     {:noreply, socket}
   end
+
+  defp maybe_update_form_with_text(%{assigns: %{mode: :single}} = socket, "") do
+    socket
+    |> assign(selection: [])
+    |> client_select(%{input_event: true})
+  end
+
+  defp maybe_update_form_with_text(%{assigns: %{mode: :single}} = socket, text) do
+    socket
+    |> assign(selection: [%{label: text, value: text}])
+    |> client_select(%{input_event: true})
+  end
+
+  defp maybe_update_form_with_text(socket, _text), do: socket
 
   @impl true
   def handle_event("selection_recovery", selection_from_client, socket) do
@@ -515,7 +530,7 @@ defmodule LiveSelect.Component do
 
   defp clear(socket, params) do
     socket
-    |> assign(selection: [])
+    |> assign(selection: [], current_text: nil)
     |> client_select(params)
   end
 
