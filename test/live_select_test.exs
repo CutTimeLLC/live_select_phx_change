@@ -1055,21 +1055,22 @@ defmodule LiveSelectTest do
     end
   end
 
-  describe "text input as form value" do
-    test "typing text without selecting sets hidden input value to typed text", %{conn: conn} do
-      stub_options([])
+  describe "combobox mode" do
+    setup %{conn: conn} do
+      {:ok, live, _html} = live(conn, "/?mode=combobox")
+      %{live: live}
+    end
 
-      {:ok, live, _html} = live(conn, "/")
+    test "typing text without selecting sets hidden input value to typed text", %{live: live} do
+      stub_options([])
 
       type(live, "foo")
 
       assert_selected(live, "foo", "foo")
     end
 
-    test "typing then selecting option updates hidden input to option value", %{conn: conn} do
+    test "typing then selecting option updates hidden input to option value", %{live: live} do
       stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
-
-      {:ok, live, _html} = live(conn, "/")
 
       type(live, "foo")
       assert_selected(live, "foo", "foo")
@@ -1083,10 +1084,8 @@ defmodule LiveSelectTest do
       assert_selected(live, "A", 1)
     end
 
-    test "typing after selecting option overrides selection with new text", %{conn: conn} do
+    test "typing after selecting option overrides selection with new text", %{live: live} do
       stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
-
-      {:ok, live, _html} = live(conn, "/")
 
       type(live, "ABC")
       select_nth_option(live, 1)
@@ -1099,7 +1098,7 @@ defmodule LiveSelectTest do
     test "clearing text after selection sets hidden input to empty", %{conn: conn} do
       stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
 
-      {:ok, live, _html} = live(conn, "/?update_min_len=0")
+      {:ok, live, _html} = live(conn, "/?mode=combobox&update_min_len=0")
 
       type(live, "ABC", update_min_len: 0)
       select_nth_option(live, 1)
@@ -1109,10 +1108,8 @@ defmodule LiveSelectTest do
       refute_selected(live)
     end
 
-    test "typing different text values updates hidden input each time", %{conn: conn} do
+    test "typing different text values updates hidden input each time", %{live: live} do
       stub_options([])
-
-      {:ok, live, _html} = live(conn, "/")
 
       type(live, "first")
       assert_selected(live, "first", "first")
@@ -1127,7 +1124,7 @@ defmodule LiveSelectTest do
     test "clicking clear button clears both text input and form field", %{conn: conn} do
       stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
 
-      {:ok, live, _html} = live(conn, "/?allow_clear=true")
+      {:ok, live, _html} = live(conn, "/?mode=combobox&allow_clear=true")
 
       type(live, "custom text", update_min_len: 0)
       assert_selected(live, "custom text", "custom text")

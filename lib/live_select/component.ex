@@ -82,7 +82,7 @@ defmodule LiveSelect.Component do
     none: []
   ]
 
-  @modes ~w(single tags quick_tags)a
+  @modes ~w(single tags quick_tags combobox)a
 
   @impl true
   def mount(socket) do
@@ -222,13 +222,13 @@ defmodule LiveSelect.Component do
     {:noreply, socket}
   end
 
-  defp maybe_update_form_with_text(%{assigns: %{mode: :single}} = socket, "") do
+  defp maybe_update_form_with_text(%{assigns: %{mode: :combobox}} = socket, "") do
     socket
     |> assign(selection: [])
     |> client_select(%{input_event: true})
   end
 
-  defp maybe_update_form_with_text(%{assigns: %{mode: :single}} = socket, text) do
+  defp maybe_update_form_with_text(%{assigns: %{mode: :combobox}} = socket, text) do
     socket
     |> assign(selection: [%{label: text, value: text}])
     |> client_select(%{input_event: true})
@@ -535,7 +535,7 @@ defmodule LiveSelect.Component do
   end
 
   defp client_select(socket, extra_params) do
-    parent_event = if socket.assigns.mode == :single, do: socket.assigns[:"phx-blur"]
+    parent_event = if socket.assigns.mode in [:single, :combobox], do: socket.assigns[:"phx-blur"]
 
     socket
     |> push_event(
