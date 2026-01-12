@@ -222,20 +222,6 @@ defmodule LiveSelect.Component do
     {:noreply, socket}
   end
 
-  defp maybe_update_form_with_text(%{assigns: %{mode: :combobox}} = socket, "") do
-    socket
-    |> assign(selection: [])
-    |> client_select(%{input_event: true})
-  end
-
-  defp maybe_update_form_with_text(%{assigns: %{mode: :combobox}} = socket, text) do
-    socket
-    |> assign(selection: [%{label: text, value: text}])
-    |> client_select(%{input_event: true})
-  end
-
-  defp maybe_update_form_with_text(socket, _text), do: socket
-
   @impl true
   def handle_event("selection_recovery", selection_from_client, socket) do
     # selection recovery. If we are here, it means that the view has crashed
@@ -343,6 +329,20 @@ defmodule LiveSelect.Component do
   def handle_event(_event, _params, socket) do
     {:noreply, socket}
   end
+
+  defp maybe_update_form_with_text(%{assigns: %{mode: :combobox}} = socket, "") do
+    socket
+    |> assign(selection: [])
+    |> client_select(%{input_event: true})
+  end
+
+  defp maybe_update_form_with_text(%{assigns: %{mode: :combobox}} = socket, text) do
+    socket
+    |> assign(selection: [%{label: text, value: text}])
+    |> client_select(%{input_event: true})
+  end
+
+  defp maybe_update_form_with_text(socket, _text), do: socket
 
   defp validate_assigns!(assigns) do
     if Map.has_key?(assigns, :style) do
