@@ -50,7 +50,10 @@ export default {
                 this.pushEventToParent("live_select_change", {id: this.el.id, field, text})
             }, this.debounceMsec())
             this.textInput().oninput = (event) => {
-                const text = event.target.value.trim()
+                let text = event.target.value
+                if (this.el.dataset["mode"] !== "combobox") {
+                    text = text.trim()
+                }
                 const field = this.el.dataset['field']
                 if (text.length >= this.updateMinLen()) {
                     this.changeEvents(this.el.id, field, text)
@@ -75,11 +78,20 @@ export default {
             })
         },
         setInputValue(value) {
-            this.textInput().value = value
+            this.textInput().value = value || ""
         },
         inputEvent(selection, mode) {
-            const selector = mode === "single" ? "input.single-mode" : (selection.length === 0 ? "input[data-live-select-empty]" : "input[type=hidden]")
-            this.el.querySelector(selector).dispatchEvent(new Event('input', {bubbles: true}))
+            const selector = mode === "single" || mode === "combobox" ? "input.single-mode" : (selection.length === 0 ? "input[data-live-select-empty]" : "input[type=hidden]")
+            const hiddenInput = this.el.querySelector(selector)
+
+            if (hiddenInput) {
+                if (mode === "single" || mode === "combobox") {
+                    const value = selection.length > 0 ? selection[0].value : ""
+                    const encodedValue = typeof value === "object" ? JSON.stringify(value) : value
+                    hiddenInput.value = encodedValue
+                }
+                hiddenInput.dispatchEvent(new Event('input', {bubbles: true}))
+            }
         },
         mounted() {
             this.maybeStyleClearButton()
@@ -91,7 +103,7 @@ export default {
             this.handleEvent("select", ({id, selection, mode, current_text, input_event, parent_event}) => {
                 if (this.el.id === id) {
                     this.selection = selection
-                    if (mode === "single") {
+                    if (mode === "single" || mode === "combobox") {
                         const label = selection.length > 0 ? selection[0].label : current_text
                         this.setInputValue(label)
                     } else {
