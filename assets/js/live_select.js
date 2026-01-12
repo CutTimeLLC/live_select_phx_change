@@ -94,14 +94,15 @@ export default {
             : "input[type=hidden]";
       const hiddenInput = this.el.querySelector(selector);
 
-      if (hiddenInput && (mode === "single" || mode === "combobox")) {
-        const value = selection.length > 0 ? selection[0].value : "";
-        const encodedValue =
-          typeof value === "object" ? JSON.stringify(value) : value;
-        hiddenInput.value = encodedValue;
+      if (hiddenInput) {
+        if (mode === "single" || mode === "combobox") {
+          const value = selection.length > 0 ? selection[0].value : "";
+          const encodedValue =
+            typeof value === "object" ? JSON.stringify(value) : value;
+          hiddenInput.value = encodedValue;
+        }
+        hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
-
-      hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
     },
     mounted() {
       this.maybeStyleClearButton();
