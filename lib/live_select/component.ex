@@ -42,7 +42,7 @@ defmodule LiveSelect.Component do
     text_input_class: nil,
     text_input_extra_class: nil,
     text_input_selected_class: nil,
-    update_min_len: 0,
+    update_min_len: 1,
     value: nil
   ]
 
@@ -150,6 +150,10 @@ defmodule LiveSelect.Component do
       end)
       |> update(:options, &normalize_options/1)
       |> assign(:text_input_field, String.to_atom("#{socket.assigns.field.field}_text_input"))
+      |> update(:update_min_len, fn
+        _, %{mode: :combobox} -> 0
+        len, _ -> len
+      end)
 
     socket =
       if field = assigns[:field] do
