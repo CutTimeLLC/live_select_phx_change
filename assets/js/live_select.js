@@ -54,7 +54,10 @@ export default {
         });
       }, this.debounceMsec());
       this.textInput().oninput = (event) => {
-        const text = event.target.value;
+        let text = event.target.value;
+        if (this.el.dataset["mode"] !== "combobox") {
+          text = text.trim();
+        }
         const field = this.el.dataset["field"];
         if (text.length >= this.updateMinLen()) {
           this.changeEvents(this.el.id, field, text);
