@@ -221,7 +221,6 @@ defmodule LiveSelect.Component do
     socket =
       socket
       |> assign(hide_dropdown: false, current_text: text, awaiting_update: true)
-      |> maybe_update_form_with_text(text)
 
     {:noreply, socket}
   end
@@ -333,20 +332,6 @@ defmodule LiveSelect.Component do
   def handle_event(_event, _params, socket) do
     {:noreply, socket}
   end
-
-  defp maybe_update_form_with_text(%{assigns: %{mode: :combobox}} = socket, "") do
-    socket
-    |> assign(selection: [])
-    |> client_select(%{input_event: true})
-  end
-
-  defp maybe_update_form_with_text(%{assigns: %{mode: :combobox}} = socket, text) do
-    socket
-    |> assign(selection: [%{label: text, value: text}])
-    |> client_select(%{input_event: true})
-  end
-
-  defp maybe_update_form_with_text(socket, _text), do: socket
 
   defp validate_assigns!(assigns) do
     if Map.has_key?(assigns, :style) do
