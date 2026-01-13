@@ -1098,13 +1098,13 @@ defmodule LiveSelectTest do
     test "clearing text after selection sets hidden input to empty", %{conn: conn} do
       stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
 
-      {:ok, live, _html} = live(conn, "/?mode=combobox&update_min_len=0")
+      {:ok, live, _html} = live(conn, "/?mode=combobox")
 
-      type(live, "ABC", update_min_len: 0)
+      type(live, "ABC")
       select_nth_option(live, 1)
       assert_selected(live, "A", 1)
 
-      type(live, "", update_min_len: 0)
+      type(live, "")
       refute_selected(live)
     end
 
@@ -1126,7 +1126,7 @@ defmodule LiveSelectTest do
 
       {:ok, live, _html} = live(conn, "/?mode=combobox&allow_clear=true")
 
-      type(live, "custom text", update_min_len: 0)
+      type(live, "custom text")
       assert_selected(live, "custom text", "custom text")
 
       live
@@ -1139,9 +1139,9 @@ defmodule LiveSelectTest do
     test "preserves spaces in typed text", %{live: live} do
       stub_options([])
 
-      type(live, "hello world")
+      type(live, "hello world ")
 
-      assert_selected(live, "hello world", "hello world")
+      assert_selected(live, "hello world ", "hello world ")
     end
   end
 
