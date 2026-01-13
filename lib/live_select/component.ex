@@ -685,7 +685,7 @@ defmodule LiveSelect.Component do
 
   defp value(_), do: nil
 
-  defp label(:single, [%{label: label} | _]), do: label
+  defp label(mode, [%{label: label} | _]) when mode in [:single, :combobox], do: label
 
   defp label(_, _), do: nil
 
