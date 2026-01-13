@@ -73,7 +73,7 @@ defmodule LiveSelectWeb.ShowcaseLive do
       field(:user_defined_options, :boolean)
 
       field(:mode, Ecto.Enum,
-        values: [:single, :tags, :quick_tags],
+        values: [:single, :tags, :quick_tags, :combobox],
         default: Component.default_opts()[:mode]
       )
 
@@ -139,7 +139,7 @@ defmodule LiveSelectWeb.ShowcaseLive do
       |> Map.reject(fn {option, value} ->
         (remove_defaults && value == Keyword.get(default_opts, option)) ||
           (settings.mode == :single && option == :max_selectable) ||
-          (settings.mode != :single && option == :allow_clear)
+          (settings.mode not in [:single, :combobox] && option == :allow_clear)
       end)
       |> Keyword.new()
     end

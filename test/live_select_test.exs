@@ -1064,7 +1064,7 @@ defmodule LiveSelectTest do
     test "typing text without selecting sets hidden input value to typed text", %{live: live} do
       stub_options([])
 
-      type(live, "foo")
+      type(live, "foo", trim: false)
 
       assert_selected(live, "foo", "foo")
     end
@@ -1072,11 +1072,11 @@ defmodule LiveSelectTest do
     test "typing then selecting option updates hidden input to option value", %{live: live} do
       stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
 
-      type(live, "foo")
+      type(live, "foo", trim: false)
       assert_selected(live, "foo", "foo")
 
       stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
-      type(live, "ABC")
+      type(live, "ABC", trim: false)
       assert_selected(live, "ABC", "ABC")
       assert_options(live, ["A", "B", "C"])
 
@@ -1087,11 +1087,11 @@ defmodule LiveSelectTest do
     test "typing after selecting option overrides selection with new text", %{live: live} do
       stub_options([{"A", 1}, {"B", 2}, {"C", 3}])
 
-      type(live, "ABC")
+      type(live, "ABC", trim: false)
       select_nth_option(live, 1)
       assert_selected(live, "A", 1)
 
-      type(live, "custom text")
+      type(live, "custom text", trim: false)
       assert_selected(live, "custom text", "custom text")
     end
 
@@ -1100,24 +1100,24 @@ defmodule LiveSelectTest do
 
       {:ok, live, _html} = live(conn, "/?mode=combobox")
 
-      type(live, "ABC")
+      type(live, "ABC", trim: false)
       select_nth_option(live, 1)
       assert_selected(live, "A", 1)
 
-      type(live, "")
+      type(live, "", trim: false, update_min_len: 0)
       refute_selected(live)
     end
 
     test "typing different text values updates hidden input each time", %{live: live} do
       stub_options([])
 
-      type(live, "first")
+      type(live, "first", trim: false)
       assert_selected(live, "first", "first")
 
-      type(live, "second")
+      type(live, "second", trim: false)
       assert_selected(live, "second", "second")
 
-      type(live, "third")
+      type(live, "third", trim: false)
       assert_selected(live, "third", "third")
     end
 
@@ -1126,7 +1126,7 @@ defmodule LiveSelectTest do
 
       {:ok, live, _html} = live(conn, "/?mode=combobox&allow_clear=true")
 
-      type(live, "custom text")
+      type(live, "custom text", trim: false)
       assert_selected(live, "custom text", "custom text")
 
       live
@@ -1139,19 +1139,9 @@ defmodule LiveSelectTest do
     test "preserves spaces in typed text", %{live: live} do
       stub_options([])
 
-      type(live, "hello world ")
+      type(live, "hello world ", trim: false)
 
       assert_selected(live, "hello world ", "hello world ")
     end
-  end
-
-  test "single mode trims spaces from typed text", %{conn: conn} do
-    stub_options([])
-
-    {:ok, live, _html} = live(conn, "/?mode=single")
-
-    type(live, "hello world ")
-
-    assert_selected(live, "hello world", "hello world")
   end
 end

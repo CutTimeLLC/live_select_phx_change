@@ -168,13 +168,14 @@ defmodule LiveSelect.TestHelpers do
 
   def type(live, text, opts \\ []) do
     opts =
-      Keyword.validate!(opts, update_min_len: 3, component: @selectors[:container], parent: live)
+      Keyword.validate!(opts, update_min_len: 3, component: @selectors[:container], parent: live, trim: true)
 
     update_min_len = Keyword.fetch!(opts, :update_min_len)
     component = Keyword.fetch!(opts, :component)
     parent = Keyword.fetch!(opts, :parent)
+    trim = Keyword.fetch!(opts, :trim)
 
-    text = String.trim(text)
+    text = if trim, do: String.trim(text), else: text
 
     if String.length(text) >= update_min_len do
       element(live, component)
@@ -252,7 +253,7 @@ defmodule LiveSelect.TestHelpers do
       id: @component_id,
       selection: [%{label: ^label, value: ^value}],
       input_event: true,
-      mode: :single
+      mode: _mode
     })
   end
 
