@@ -191,6 +191,17 @@ defmodule LiveSelect.Component do
   end
 
   @impl true
+  def handle_event("blur", _params, %{assigns: %{mode: :combobox}} = socket) do
+    socket =
+      socket
+      |> maybe_select()
+      |> assign(:hide_dropdown, true)
+      |> client_select(%{parent_event: socket.assigns[:"phx-blur"]})
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("blur", _params, socket) do
     socket =
       maybe_restore_selection(socket)
