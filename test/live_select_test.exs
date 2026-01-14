@@ -888,6 +888,8 @@ defmodule LiveSelectTest do
 
         select_nth_option(live, 2)
 
+        type(live, "ABC")
+
         assert_selected_option_class(
           live,
           2,
@@ -903,6 +905,8 @@ defmodule LiveSelectTest do
         type(live, "ABC")
 
         select_nth_option(live, 2)
+
+        type(live, "ABC")
 
         assert_selected_option_class(
           live,
@@ -920,6 +924,8 @@ defmodule LiveSelectTest do
 
         select_nth_option(live, 2)
 
+        type(live, "ABC")
+
         assert_available_option_class(
           live,
           2,
@@ -935,6 +941,8 @@ defmodule LiveSelectTest do
         type(live, "ABC")
 
         select_nth_option(live, 2)
+
+        type(live, "ABC")
 
         assert_available_option_class(
           live,
