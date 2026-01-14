@@ -192,6 +192,8 @@ defmodule LiveSelect.Component do
 
   @impl true
   def handle_event("blur", _params, %{assigns: %{mode: :combobox}} = socket) do
+    dbg("Combobox blur is firing")
+
     socket =
       socket
       |> maybe_select()
