@@ -384,10 +384,10 @@ defmodule LiveSelect do
       ~S(an id to assign to the component. If none is provided, `#{form_name}_#{field}_live_select_component` will be used)
 
   attr :mode, :atom,
-    values: [:single, :tags, :quick_tags],
+    values: [:single, :tags, :quick_tags, :combobox],
     default: Component.default_opts()[:mode],
     doc:
-      "either `:single` (for single selection), `:tags` (for multiple selection using tags), or `:quick_tags` (multiple selection but tags can be selected/deselected in quick succession)"
+      "either `:single` (for single selection), `:tags` (for multiple selection using tags), `:quick_tags` (multiple selection but tags can be selected/deselected in quick succession), or `:combobox` (text input becomes form value, selecting an option updates to that value)"
 
   attr :options, :list,
     doc:

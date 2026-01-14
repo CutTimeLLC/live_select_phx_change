@@ -7,6 +7,7 @@
   data-update-min-len={@update_min_len}
   data-field={@field.id}
   data-debounce={@debounce}
+  data-mode={@mode}
 >
   <div class={class(@style, :tags_container, @tags_container_class, @tags_container_extra_class)}>
     <%= if (@mode in [:tags, :quick_tags]) && Enum.any?(@selection) do %>
@@ -60,7 +61,7 @@
       phx_blur: "blur",
       value: label(@mode, @selection)
     ) %>
-    <%= if @mode == :single && @allow_clear && !@disabled && Enum.any?(@selection) do %>
+    <%= if @mode in [:single, :combobox] && @allow_clear && !@disabled && Enum.any?(@selection) do %>
       <button
         type="button"
         phx-click="clear"
@@ -75,7 +76,7 @@
       </button>
     <% end %>
   </div>
-  <%= if @mode == :single do %>
+  <%= if @mode in [:single, :combobox] do %>
     <%= hidden_input(@field.form, @field.field,
       disabled: @disabled,
       class: "single-mode",

@@ -82,7 +82,7 @@ defmodule LiveSelect.Component do
     none: []
   ]
 
-  @modes ~w(single tags quick_tags)a
+  @modes ~w(single tags quick_tags combobox)a
 
   @impl true
   def mount(socket) do
@@ -150,6 +150,10 @@ defmodule LiveSelect.Component do
       end)
       |> update(:options, &normalize_options/1)
       |> assign(:text_input_field, String.to_atom("#{socket.assigns.field.field}_text_input"))
+      |> update(:update_min_len, fn
+        _, %{mode: :combobox} -> 0
+        len, _ -> len
+      end)
 
     socket =
       if field = assigns[:field] do
@@ -184,6 +188,17 @@ defmodule LiveSelect.Component do
     socket = maybe_save_selection(socket)
 
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_event("blur", _params, %{assigns: %{mode: :combobox}} = socket) do
+    socket =
+      socket
+      |> maybe_select()
+      |> assign(:hide_dropdown, true)
+      |> client_select(%{parent_event: socket.assigns[:"phx-blur"]})
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -515,12 +530,12 @@ defmodule LiveSelect.Component do
 
   defp clear(socket, params) do
     socket
-    |> assign(selection: [])
+    |> assign(selection: [], current_text: nil)
     |> client_select(params)
   end
 
   defp client_select(socket, extra_params) do
-    parent_event = if socket.assigns.mode == :single, do: socket.assigns[:"phx-blur"]
+    parent_event = if socket.assigns.mode in [:single, :combobox], do: socket.assigns[:"phx-blur"]
 
     socket
     |> push_event(
@@ -666,7 +681,7 @@ defmodule LiveSelect.Component do
 
   defp value(_), do: nil
 
-  defp label(:single, [%{label: label} | _]), do: label
+  defp label(mode, [%{label: label} | _]) when mode in [:single, :combobox], do: label
 
   defp label(_, _), do: nil
 
